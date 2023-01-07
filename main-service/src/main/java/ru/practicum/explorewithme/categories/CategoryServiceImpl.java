@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
-public class CategoryServiceImpl implements CategoryService{
+public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 

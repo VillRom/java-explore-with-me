@@ -13,5 +13,5 @@ public interface ParticipationService {
     ParticipationDto addRequestByUserForEvent(Long userId, Long eventId);
 
     //Отмена своего запроса на участие в событии
-    ParticipationDto canselRequestByUserForEvent(Long userId, Long EventId);
+    ParticipationDto canselRequestByUserForEvent(Long userId, Long eventId);
 }

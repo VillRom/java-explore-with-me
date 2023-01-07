@@ -33,7 +33,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class EventServiceImpl implements EventService{
+public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
 
@@ -72,7 +72,6 @@ public class EventServiceImpl implements EventService{
         } else if (sort != null && sort.equals("VIEWS")) {
             eventsWithoutSort = eventRepository.getEventsWithSortViews(categoriesId,
                     paid, start, end, text, text, PageRequest.of(from, size));
-            
         } else {
             eventsWithoutSort = eventRepository.findAll(PageRequest.of(from, size));
         }
@@ -111,8 +110,8 @@ public class EventServiceImpl implements EventService{
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь с id-" + userId + " не найден");
         }
-        if (LocalDateTime.parse(eventDto.getEventDate(), formatter).
-                isBefore(LocalDateTime.now().plusHours(2))) {
+        if (LocalDateTime.parse(eventDto.getEventDate(), formatter)
+                .isBefore(LocalDateTime.now().plusHours(2))) {
             throw new EventsException("Время начала события не может быть раньше, чем через 2 часа");
         }
         Event event = EventMapper.newEventDtoToEvent(eventDto, categoryRepository
@@ -149,8 +148,8 @@ public class EventServiceImpl implements EventService{
         if (eventRepository.getReferenceById(updateEventRequest.getEventId()).getState().equals("PUBLISHED")) {
             throw new EventsException("Событие нельзя изменить, т.к. оно уже опубликованно");
         }
-        if (LocalDateTime.parse(updateEventRequest.getEventDate(), formatter).
-                isBefore(LocalDateTime.now().plusHours(2))) {
+        if (LocalDateTime.parse(updateEventRequest.getEventDate(), formatter)
+                .isBefore(LocalDateTime.now().plusHours(2))) {
             throw new EventsException("Время начала события не может быть раньше, чем через 2 часа");
         }
         Event updateEvent = eventRepository.getReferenceById(updateEventRequest.getEventId());
@@ -250,12 +249,12 @@ public class EventServiceImpl implements EventService{
         }
         Participation confirmRequest = participationRepository.getReferenceById(reqId);
         confirmRequest.setStatus("CONFIRMED");
-        ParticipationDto participationDto = ParticipationMapper.
-                participationToParticipationDto(participationRepository.save(confirmRequest));
+        ParticipationDto participationDto = ParticipationMapper
+                .participationToParticipationDto(participationRepository.save(confirmRequest));
         if (participationRepository.countByEvent_IdAndStatusContaining(eventId, "CONFIRMED")
                 .equals(eventRepository.getReferenceById(eventId).getParticipantLimit())) {
-            List<Participation> rejectedRequests = participationRepository.
-                    findAllByEvent_IdAndStatusContaining(eventId, "PENDING");
+            List<Participation> rejectedRequests = participationRepository
+                    .findAllByEvent_IdAndStatusContaining(eventId, "PENDING");
             rejectedRequests.forEach(request -> request.setStatus("REJECTED"));
             participationRepository.saveAll(rejectedRequests);
         }
