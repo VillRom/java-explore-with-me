@@ -27,7 +27,7 @@ public class PrivateClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getEventsByUserPrivate(Long userId, int from, int size) {
-        Map<String, Object> parameters =Map.of(
+        Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size
         );

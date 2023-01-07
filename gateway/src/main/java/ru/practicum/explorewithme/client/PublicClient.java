@@ -28,21 +28,21 @@ public class PublicClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllCategoriesPublic(int from, int size) {
-        Map<String, Object> parameters =Map.of(
+        Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size
         );
         return get("/categories?from={from}&size={size}", parameters);
     }
 
-    public ResponseEntity<Object> getCategoryByIdPublic( Long catId) {
+    public ResponseEntity<Object> getCategoryByIdPublic(Long catId) {
         return get("/categories/" + catId);
     }
 
     public ResponseEntity<Object> getCompilationsPublic(Boolean pinned, int from, int size) {
         Map<String, Object> parameters;
         if (pinned == null) {
-            parameters =Map.of(
+            parameters = Map.of(
                     "from", from,
                     "size", size
             );
@@ -93,7 +93,7 @@ public class PublicClient extends BaseClient {
         StringBuilder urisBuilder = new StringBuilder("/events?");
         for (int i = 0; i < maps.size(); i++) {
             if (maps.get(i) != null) {
-                if(i == 1) {
+                if (i == 1) {
                     map.put(strings.get(i), categories.toArray());
                     urisBuilder.append(strings.get(i)).append("={").append(strings.get(i)).append("}&");
                 } else {
@@ -106,10 +106,10 @@ public class PublicClient extends BaseClient {
         return get(uris, map);
     }
 
-    public ResponseEntity<Object> getFullInfoAboutEventByIdPublic(Long Id, HttpServletRequest request) {
+    public ResponseEntity<Object> getFullInfoAboutEventByIdPublic(Long id, HttpServletRequest request) {
         Map<String, Object> parameters = Map.of(
                 "request", request
         );
-        return get("/events/" + Id + "?request={request}", parameters);
+        return get("/events/" + id + "?request={request}", parameters);
     }
 }

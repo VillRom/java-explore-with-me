@@ -73,7 +73,7 @@ public class AdminClient extends BaseClient {
         StringBuilder urisBuilder = new StringBuilder("/events?");
         for (int i = 0; i < maps.size(); i++) {
             if (maps.get(i) != null) {
-                if(i == 0) {
+                if (i == 0) {
                     map.put(strings.get(i), users.toArray());
                     urisBuilder.append(strings.get(i)).append("={").append(strings.get(i)).append("}&");
                 } else if (i == 1) {
@@ -82,7 +82,7 @@ public class AdminClient extends BaseClient {
                 } else if (i == 2) {
                     map.put(strings.get(i), categories.toArray());
                     urisBuilder.append(strings.get(i)).append("={").append(strings.get(i)).append("}&");
-                }else {
+                } else {
                     map.put(strings.get(i), maps.get(i));
                     urisBuilder.append(strings.get(i)).append("={").append(strings.get(i)).append("}&");
                 }
@@ -113,7 +113,7 @@ public class AdminClient extends BaseClient {
     }
 
     public ResponseEntity<Object> deleteCategoryAdmin(Long catId) {
-        return delete("/categories/" +catId);
+        return delete("/categories/" + catId);
     }
 
     public ResponseEntity<Object> addCompilationAdmin(NewCompilationDto compilationDto) {
