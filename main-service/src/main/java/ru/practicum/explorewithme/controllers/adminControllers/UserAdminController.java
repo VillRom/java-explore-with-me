@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.users.UserService;
 import ru.practicum.explorewithme.users.dto.UserDto;
 
-import java.util.List;
-import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -22,15 +22,24 @@ public class UserAdminController {
     }
 
     @PostMapping
-    public UserDto createUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@RequestBody UserDto userDto, HttpServletRequest request) {
+        Map map = new HashMap();
+
+        Enumeration headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String key = (String) headerNames.nextElement();
+            String value = request.getHeader(key);
+            map.put(key, value);
+        }
         log.info("Create User {}", userDto);
+
         return userService.addUser(userDto);
     }
 
     @GetMapping
     public List<UserDto> getUsersById(@RequestParam Set<Long> ids,
-                                      @RequestParam int from,
-                                      @RequestParam int size) {
+                                      @RequestParam(defaultValue = "0") int from,
+                                      @RequestParam(defaultValue = "10") int size) {
         log.info("Get users by set id {}", ids);
         return userService.findUsersById(ids, from, size);
     }

@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.adminRequest.users.dto.UserDto;
 import ru.practicum.explorewithme.client.AdminClient;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -21,7 +25,8 @@ public class AdminUserController {
     @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody @Valid UserDto userDto) {
         log.info("Create User {}", userDto);
-        return adminClient.addUserAdmin(userDto);
+        ResponseEntity<Object> user = adminClient.addUserAdmin(userDto);
+        return user;
     }
 
     @GetMapping
