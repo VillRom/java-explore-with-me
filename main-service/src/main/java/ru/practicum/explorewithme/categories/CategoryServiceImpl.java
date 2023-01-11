@@ -60,6 +60,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryById(Long categoryId) {
         return CategoryMapper.categoryToCategoryDto(categoryRepository.findById(categoryId)
-                .orElseThrow( () -> new NotFoundException("Категория с id-" + categoryId + " не найдена")));
+                .orElseThrow(() -> new NotFoundException("Категория с id-" + categoryId + " не найдена")));
     }
 }
