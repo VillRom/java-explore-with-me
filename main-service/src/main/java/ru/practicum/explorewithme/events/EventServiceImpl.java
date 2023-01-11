@@ -55,7 +55,7 @@ public class EventServiceImpl implements EventService {
         } else if (sort != null && sort.equals("VIEWS")) {
             eventsWithSort = eventRepository.getEventsWithSortViews(categoriesId,
                     paid, rangeStart, rangeEnd, EventState.PUBLISHED, text, text, PageRequest.of(from, size));
-        } else {
+        } else if (categoriesId != null) {
             eventsWithSort = eventRepository.findAll(PageRequest.of(from, size)).stream()
                     .filter(event -> categoriesId.contains(event.getCategory().getId())
                     && event.getAnnotation().equalsIgnoreCase(text)
@@ -63,18 +63,39 @@ public class EventServiceImpl implements EventService {
                     && event.getEventDate().isAfter(start)
                     && event.getEventDate().isBefore(end))
                     .collect(Collectors.toList());
+        } else if (text != null) {
+            eventsWithSort = eventRepository.findAll(PageRequest.of(from, size)).stream()
+                    .filter(event -> event.getAnnotation().equalsIgnoreCase(text)
+                            && event.getPaid() == paid
+                            && event.getEventDate().isAfter(start)
+                            && event.getEventDate().isBefore(end))
+                    .collect(Collectors.toList());
+        } else if (paid != null) {
+            eventsWithSort = eventRepository.findAll(PageRequest.of(from, size)).stream()
+                    .filter(event -> event.getPaid() == paid
+                            && event.getEventDate().isAfter(start)
+                            && event.getEventDate().isBefore(end))
+                    .collect(Collectors.toList());
+        } else {
+            eventsWithSort = eventRepository.findAll(PageRequest.of(from, size)).stream()
+                    .filter(event -> event.getEventDate().isAfter(start)
+                            && event.getEventDate().isBefore(end))
+                    .collect(Collectors.toList());
         }
         List<EventShortDto> eventsShortDto = new ArrayList<>();
         List<String> uris = new ArrayList<>();
+        saveView(request.getRequestURI(), request.getLocalAddr());
         for (Event event : eventsWithSort) {
             saveView(request.getRequestURI() + "/" + event.getId(), request.getRemoteAddr());
             uris.add(request.getRequestURI() + "/" +  event.getId());
         }
         List<ViewsStats> views = getViewsByEvent(rangeStart, rangeEnd, uris);
         for (Event event : Objects.requireNonNull(eventsWithSort)) {
-            eventsShortDto.add(EventMapper.eventToEventShortDto(event, views.stream()
+            event.setViews(views.stream()
                     .filter(viewsStats -> viewsStats.getUri().equals(request.getRequestURI() + "/" + event.getId()))
-                    .findFirst().get().getHits().intValue()));
+                    .findFirst().get().getHits());
+            eventsShortDto.add(EventMapper.eventToEventShortDto(event, participationRepository
+                    .countByEvent_IdAndStatusContaining(event.getId(), "CONFIRMED")));
         }
         return eventsShortDto;
     }
