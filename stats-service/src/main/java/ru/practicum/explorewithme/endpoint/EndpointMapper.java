@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.endpoint;
 
+import javafx.util.Pair;
 import lombok.experimental.UtilityClass;
 import ru.practicum.explorewithme.endpoint.dto.EndpointHitDto;
 import ru.practicum.explorewithme.endpoint.dto.ViewsStats;
@@ -7,16 +8,21 @@ import ru.practicum.explorewithme.endpoint.model.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class EndpointMapper {
 
-    public static ViewsStats endpointHitToViewStats(EndpointHit hit, Long views) {
-        ViewsStats viewsStats = new ViewsStats();
-        viewsStats.setUri(hit.getUri());
-        viewsStats.setApp(hit.getApp());
-        viewsStats.setHits(views);
-        return viewsStats;
+    public static List<ViewsStats> endpointHitsToViewsStats(List<EndpointHit> hits) {
+        return  hits.stream()
+                .collect(Collectors.groupingBy(
+                        hit -> new Pair<>(hit.getApp(), hit.getUri()), Collectors.counting()))
+                .entrySet().stream().map(entry -> new ViewsStats(
+                        entry.getKey().getKey(),
+                        entry.getKey().getValue(),
+                        entry.getValue().longValue()))
+                .collect(Collectors.toList());
     }
 
     public static EndpointHit endpointHitDtoToEndpointHit(EndpointHitDto dto) {

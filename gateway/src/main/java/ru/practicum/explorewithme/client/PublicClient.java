@@ -7,9 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.explorewithme.client.baseClient.BaseClient;
+import ru.practicum.explorewithme.client.baseclient.BaseClient;
 import ru.practicum.explorewithme.exceptions.RequestException;
-import ru.practicum.explorewithme.publicRequests.dto.EventSort;
+import ru.practicum.explorewithme.publicrequests.dto.EventSort;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -18,6 +18,12 @@ import java.util.*;
 
 @Service
 public class PublicClient extends BaseClient {
+
+    private static final String URL_CATEGORIES = "/categories";
+
+    private static final String URL_COMPILATIONS = "/compilations";
+
+    private static final String URL_EVENTS = "/events";
 
     @Autowired
     public PublicClient(@Value("${main-service.url}") String serviceUrl, RestTemplateBuilder builder) {
@@ -32,11 +38,11 @@ public class PublicClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("/categories?from={from}&size={size}", parameters);
+        return get(URL_CATEGORIES + "?from={from}&size={size}", parameters);
     }
 
     public ResponseEntity<Object> getCategoryByIdPublic(Long catId) {
-        return get("/categories/" + catId);
+        return get(URL_CATEGORIES + "/" + catId);
     }
 
     public ResponseEntity<Object> getCompilationsPublic(Boolean pinned, int from, int size) {
@@ -46,19 +52,19 @@ public class PublicClient extends BaseClient {
                     "from", from,
                     "size", size
             );
-            return get("/compilations?from={from}&size={size}", parameters);
+            return get(URL_COMPILATIONS + "?from={from}&size={size}", parameters);
         } else {
             parameters = Map.of(
                     "pinned", pinned,
                     "from", from,
                     "size", size
             );
-            return get("/compilations?pinned={pinned}&from={from}&size={size}", parameters);
+            return get(URL_COMPILATIONS + "?pinned={pinned}&from={from}&size={size}", parameters);
         }
     }
 
     public ResponseEntity<Object> getCompilationByIdPublic(Long compId) {
-        return get("/compilations/" + compId);
+        return get(URL_COMPILATIONS + "/" + compId);
     }
 
     public ResponseEntity<Object> getEventsWithFilterPublic(String text, Set<Long> categories, Boolean paid,
@@ -90,7 +96,7 @@ public class PublicClient extends BaseClient {
                 "rangeEnd", "onlyAvailable", "sort", "from", "size");
         String uris;
         Map<String, Object> map = new HashMap<>();
-        StringBuilder urisBuilder = new StringBuilder("/events?");
+        StringBuilder urisBuilder = new StringBuilder(URL_EVENTS + "?");
         for (int i = 0; i < maps.size(); i++) {
             if (maps.get(i) != null) {
                 if (i == 1) {
@@ -110,6 +116,6 @@ public class PublicClient extends BaseClient {
         Map<String, Object> parameters = Map.of(
                 "request", request
         );
-        return get("/events/" + id + "?request={request}", parameters);
+        return get(URL_EVENTS + "/" + id + "?request={request}", parameters);
     }
 }

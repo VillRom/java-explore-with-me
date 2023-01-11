@@ -1,16 +1,16 @@
 package ru.practicum.explorewithme.statsclient;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.explorewithme.statsclient.endpoint.EndpointHit;
-import ru.practicum.explorewithme.statsclient.endpoint.Views;
 import ru.practicum.explorewithme.statsclient.endpoint.ViewsStats;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.*;
 
 
 @Component
@@ -21,24 +21,34 @@ public class StatsClient {
     private String serverUrl;
 
     public List<ViewsStats> getViews(String start, String end, List<String> uris, Boolean unique) {
-        String uri = serverUrl + "/stats?start=" + start + "&end=" + end;
+        String uri = serverUrl + "/stats?start={start}&end={end}";
+        Map<String, Object> parameters;
         if (uris == null) {
-            uri = uri + "&unique=" + unique;
+            parameters = Map.of(
+                    "start", start,
+                    "end", end,
+                    "unique", unique
+            );
+            uri = uri + "&unique={unique}";
         } else {
-            uri = uri + "&uris=";
+            parameters = Map.of(
+                    "start", start,
+                    "end", end,
+                    "uris", uris,
+                    "unique", unique
+            );
+            uri = uri + "&uris={uris}&unique={unique}";
         }
-        try {
-            Views response = restTemplate.getForObject(new URI(uri), Views.class);
-                return response != null ? response.getViewsStats() : null;
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        ResponseEntity<List<ViewsStats>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+                new ParameterizedTypeReference<>() {
+                }, parameters);
+        return response.getBody();
     }
 
-    public ResponseEntity<ViewsStats> postEndpointHit(EndpointHit hit) {
+    public void postEndpointHit(EndpointHit hit) {
         String uri = serverUrl + "/hit";
         try {
-            return restTemplate.postForEntity(new URI(uri), hit, ViewsStats.class);
+            restTemplate.postForEntity(new URI(uri), hit, ViewsStats.class);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

@@ -58,43 +58,33 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public void removeAnEventFromCompilation(Long compId, Long eventId) {
-        if (!compRepository.existsById(compId)) {
-            throw new NotFoundException("Entity with id-" + compId + " not found");
-        }
+        Compilation compilation = compRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException("Entity with id-" + compId + " not found"));
         if (!eventRepository.existsById(eventId)) {
             throw new NotFoundException("Событие с id-" + eventId + " не найдено");
         }
-        Compilation compilation = compRepository.getReferenceById(compId);
-        List<Event> events = compilation.getEvents().stream().filter(event -> !event.getId().equals(eventId))
+        List<Event> events = compilation.getEvents().stream()
+                .filter(event -> !event.getId().equals(eventId))
                 .collect(Collectors.toList());
         compilation.setEvents(events);
         compRepository.save(compilation);
-        compRepository.getReferenceById(compId);
-        System.out.println("!");
     }
 
     @Override
     @Transactional
     public void addEventToCompilation(Long compId, Long eventId) {
-        if (!compRepository.existsById(compId)) {
-            throw new NotFoundException("Entity with id-" + compId + " not found");
-        }
-        if (!eventRepository.existsById(eventId)) {
-            throw new NotFoundException("Событие с id-" + eventId + " не найдено");
-        }
-        Compilation compilation = compRepository.getReferenceById(compId);
-        compilation.getEvents().add(eventRepository.getReferenceById(eventId));
+        Compilation compilation = compRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException("Entity with id-" + compId + " not found"));
+        compilation.getEvents().add(eventRepository.findById(eventId).orElseThrow(() ->
+                new NotFoundException("Событие с id-" + eventId + " не найдено")));
         compRepository.save(compilation);
-        System.out.println("!");
     }
 
     @Override
     @Transactional
     public void unpinCompilation(Long compId) {
-        if (!compRepository.existsById(compId)) {
-            throw new NotFoundException("Entity with id-" + compId + " not found");
-        }
-        Compilation compilation = compRepository.getReferenceById(compId);
+        Compilation compilation = compRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException("Entity with id-" + compId + " not found"));
         compilation.setPinned(false);
         compRepository.save(compilation);
     }
@@ -102,10 +92,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public void pinCompilation(Long compId) {
-        if (!compRepository.existsById(compId)) {
-            throw new NotFoundException("Entity with id-" + compId + " not found");
-        }
-        Compilation compilation = compRepository.getReferenceById(compId);
+        Compilation compilation = compRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException("Entity with id-" + compId + " not found"));
         compilation.setPinned(true);
         compRepository.save(compilation);
     }
@@ -127,8 +115,7 @@ public class CompilationServiceImpl implements CompilationService {
                 compDto.add(CompilationMapper.compilationToCompilationDto(compilation, eventsDto));
             }
         } else {
-            compilations = compRepository.findAllByPinned(pinned, PageRequest.of(from, size))
-                    .getContent();
+            compilations = compRepository.findAllByPinned(pinned, PageRequest.of(from, size)).getContent();
             for (Compilation compilation : compilations) {
                 List<EventShortDto> eventsDto = new ArrayList<>();
                 List<Event> events = compilation.getEvents();
@@ -145,15 +132,14 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto getCompilationById(Long compId) {
-        if (!compRepository.existsById(compId)) {
-            throw new NotFoundException("Entity with id-" + compId + " not found");
-        }
+        Compilation compilation = compRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException("Entity with id-" + compId + " not found"));
+        List<Event> events = compilation.getEvents();
         List<EventShortDto> eventsDto = new ArrayList<>();
-        List<Event> events = compRepository.getReferenceById(compId).getEvents();
         for (Event event : events) {
             eventsDto.add(EventMapper.eventToEventShortDto(event,
                     participationRepository.countByEvent_IdAndStatusContaining(event.getId(), "CONFIRMED")));
         }
-        return CompilationMapper.compilationToCompilationDto(compRepository.getReferenceById(compId), eventsDto);
+        return CompilationMapper.compilationToCompilationDto(compilation, eventsDto);
     }
 }

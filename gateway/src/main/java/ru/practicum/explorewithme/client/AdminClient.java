@@ -7,11 +7,11 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.explorewithme.adminRequest.categories.dto.CategoryDto;
-import ru.practicum.explorewithme.adminRequest.compilations.dto.NewCompilationDto;
-import ru.practicum.explorewithme.adminRequest.events.dto.EventDto;
-import ru.practicum.explorewithme.adminRequest.users.dto.UserDto;
-import ru.practicum.explorewithme.client.baseClient.BaseClient;
+import ru.practicum.explorewithme.adminrequest.categories.dto.CategoryDto;
+import ru.practicum.explorewithme.adminrequest.compilations.dto.NewCompilationDto;
+import ru.practicum.explorewithme.adminrequest.events.dto.EventDto;
+import ru.practicum.explorewithme.adminrequest.users.dto.UserDto;
+import ru.practicum.explorewithme.client.baseclient.BaseClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +22,14 @@ public class AdminClient extends BaseClient {
 
     private static final String API_PREFIX = "/admin";
 
+    private static final String URL_USERS = "/users";
+
+    private static final String URL_EVENTS = "/events";
+
+    private static final String URL_CATEGORIES = "/categories";
+
+    private static final String URL_COMPILATIONS = "/compilations";
+
     @Autowired
     public AdminClient(@Value("${main-service.url}") String serverUrl, RestTemplateBuilder builder) {
         super(builder
@@ -31,7 +39,7 @@ public class AdminClient extends BaseClient {
     }
 
     public ResponseEntity<Object> addUserAdmin(UserDto user) {
-        return post("/users", user);
+        return post(URL_USERS, user);
     }
 
     public ResponseEntity<Object> getUsersAdmin(Set<Long> ids, int from, int size) {
@@ -40,11 +48,11 @@ public class AdminClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("/users?ids={ids}&from={from}&size={size}", parameters);
+        return get(URL_USERS + "?ids={ids}&from={from}&size={size}", parameters);
     }
 
     public ResponseEntity<Object> deleteUserAdmin(Long userId) {
-        return delete("/users/" + userId);
+        return delete(URL_USERS + "/" + userId);
     }
 
     public ResponseEntity<Object> getEventsAdmin(Set<Long> users, Set<String> states, Set<Long> categories,
@@ -70,7 +78,7 @@ public class AdminClient extends BaseClient {
                 "rangeEnd", "from", "size");
         String uris;
         Map<String, Object> map = new HashMap<>();
-        StringBuilder urisBuilder = new StringBuilder("/events?");
+        StringBuilder urisBuilder = new StringBuilder(URL_EVENTS + "?");
         for (int i = 0; i < maps.size(); i++) {
             if (maps.get(i) != null) {
                 if (i == 0) {
@@ -93,50 +101,50 @@ public class AdminClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateEventAdmin(Long eventId, EventDto eventDto) {
-        return put("/events/" + eventId, eventDto);
+        return put(URL_EVENTS + "/" + eventId, eventDto);
     }
 
     public ResponseEntity<Object> publicationEventAdmin(Long eventId) {
-        return patch("/events/" + eventId + "/publish");
+        return patch(URL_EVENTS + "/" + eventId + "/publish");
     }
 
     public ResponseEntity<Object> rejectEventAdmin(Long eventId) {
-        return patch("/events/" + eventId + "/reject");
+        return patch(URL_EVENTS + "/" + eventId + "/reject");
     }
 
     public ResponseEntity<Object> addCategoryAdmin(CategoryDto categoryDto) {
-        return post("/categories", categoryDto);
+        return post(URL_CATEGORIES, categoryDto);
     }
 
     public ResponseEntity<Object> updateCategoryAdmin(CategoryDto categoryDto) {
-        return patch("/categories", categoryDto);
+        return patch(URL_CATEGORIES, categoryDto);
     }
 
     public ResponseEntity<Object> deleteCategoryAdmin(Long catId) {
-        return delete("/categories/" + catId);
+        return delete(URL_CATEGORIES + "/" + catId);
     }
 
     public ResponseEntity<Object> addCompilationAdmin(NewCompilationDto compilationDto) {
-        return post("/compilations", compilationDto);
+        return post(URL_COMPILATIONS, compilationDto);
     }
 
     public ResponseEntity<Object> deleteCompilationAdmin(Long compId) {
-        return delete("/compilations/" + compId);
+        return delete(URL_COMPILATIONS + "/" + compId);
     }
 
     public ResponseEntity<Object> deleteEventFromCompilationAdmin(Long compId, Long eventId) {
-        return delete("/compilations/" + compId + "/events/" + eventId);
+        return delete(URL_COMPILATIONS + "/" + compId + URL_EVENTS + "/" + eventId);
     }
 
     public ResponseEntity<Object> addEventToCompilationAdmin(Long compId, Long eventId) {
-        return patch("/compilations/" + compId + "/events/" + eventId);
+        return patch(URL_COMPILATIONS + "/" + compId + URL_EVENTS + "/" + eventId);
     }
 
     public ResponseEntity<Object> unpinCompilationOnTheMainPageAdmin(Long compId) {
-        return delete("/compilations/" + compId + "/pin");
+        return delete(URL_COMPILATIONS + "/" + compId + "/pin");
     }
 
     public ResponseEntity<Object> pinCompilationOnTheMainPageAdmin(Long compId) {
-        return patch("/compilations/" + compId + "/pin");
+        return patch(URL_COMPILATIONS + "/" + compId + "/pin");
     }
 }

@@ -1,13 +1,16 @@
 package ru.practicum.explorewithme.participation.model;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explorewithme.events.model.Event;
 import ru.practicum.explorewithme.users.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "participation")
 public class Participation {

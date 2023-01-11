@@ -2,12 +2,13 @@ package ru.practicum.explorewithme.endpoint;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.endpoint.dto.EndpointHitDto;
 import ru.practicum.explorewithme.endpoint.dto.ViewsStats;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @Slf4j
@@ -21,14 +22,15 @@ public class EndpointController {
     }
 
     @PostMapping(value = "/hit")
-    public ViewsStats addHit(@RequestBody EndpointHitDto hit) {
+    public void addHit(@RequestBody EndpointHitDto hit) {
         log.info("Add endpointHit {}", hit);
-        return endpointService.addHit(hit);
+        endpointService.addHit(hit);
     }
 
     @GetMapping("/stats")
-    public List<ViewsStats> getViews(@RequestParam String start, @RequestParam String end,
-                                     @RequestParam(required = false) Set<String> uris,
+    public List<ViewsStats> getViews(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+                                     @RequestParam(required = false) List<String> uris,
                                      @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Get views");
         return endpointService.getHits(start, end, uris, unique);

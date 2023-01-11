@@ -8,7 +8,6 @@ import ru.practicum.explorewithme.categories.dto.CategoryDto;
 import ru.practicum.explorewithme.events.EventRepository;
 import ru.practicum.explorewithme.exception.EventsException;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.exception.RequestException;
 
 import java.util.List;
 
@@ -24,9 +23,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto addCategory(CategoryDto categoryDto) {
-        if (categoryDto.getName() == null) {
-            throw new RequestException("Поле name не должно быть пустым");
-        }
         return CategoryMapper.categoryToCategoryDto(categoryRepository.save(CategoryMapper
                 .categoryDtoToCategory(categoryDto)));
     }
@@ -34,9 +30,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto) {
-        if (categoryDto.getId() == null || categoryDto.getName() == null) {
-            throw new RequestException("В теле запроса не должно быть пустых полей");
-        }
         if (!categoryRepository.existsById(categoryDto.getId())) {
             throw new NotFoundException("Категория с id-" + categoryDto.getId() + " не найдена");
         }
@@ -50,9 +43,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(categoryId)) {
             throw new NotFoundException("Категория с id-" + categoryId + " не найдена");
         }
-        if (eventRepository.countByCategory_Id(categoryId) != 0) {
-            throw new EventsException("Категорию нельзя удалить, т.к. с ней связанно " + eventRepository
-                    .countByCategory_Id(categoryId) + " событий");
+        Long numberOfRelatedEvents = eventRepository.countByCategory_Id(categoryId);
+        if (numberOfRelatedEvents != 0) {
+            throw new EventsException("Категорию нельзя удалить, т.к. с ней связанно " + numberOfRelatedEvents
+                    + " событий");
         }
         categoryRepository.deleteById(categoryId);
     }
@@ -65,9 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryById(Long categoryId) {
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new NotFoundException("Категория с id-" + categoryId + " не найдена");
-        }
-        return CategoryMapper.categoryToCategoryDto(categoryRepository.getReferenceById(categoryId));
+        return CategoryMapper.categoryToCategoryDto(categoryRepository.findById(categoryId)
+                .orElseThrow( () -> new NotFoundException("Категория с id-" + categoryId + " не найдена")));
     }
 }

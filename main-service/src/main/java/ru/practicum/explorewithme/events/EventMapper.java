@@ -8,7 +8,6 @@ import ru.practicum.explorewithme.events.dto.EventShortDto;
 import ru.practicum.explorewithme.events.model.Event;
 import ru.practicum.explorewithme.users.model.User;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
@@ -16,12 +15,11 @@ import java.time.format.DateTimeFormatter;
 public class EventMapper {
 
     public static Event newEventDtoToEvent(EventDto eventDto, Category category, User initiator) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Event event = new Event();
         event.setAnnotation(eventDto.getAnnotation());
         event.setCategory(category);
         event.setDescription(eventDto.getDescription());
-        event.setEventDate(LocalDateTime.parse(eventDto.getEventDate(), formatter));
+        event.setEventDate(eventDto.getEventDate());
         event.setLatitude(eventDto.getLocation().getLat());
         event.setLongitude(eventDto.getLocation().getLon());
         event.setPaid(eventDto.getPaid());
@@ -50,7 +48,7 @@ public class EventMapper {
         eventFullDto.setParticipantLimit(event.getParticipantLimit());
         eventFullDto.setPublishedOn(event.getPublishedOn());
         eventFullDto.setRequestModeration(event.getRequestModeration());
-        eventFullDto.setState(event.getState());
+        eventFullDto.setState(event.getState().name());
         eventFullDto.setTitle(event.getTitle());
         eventFullDto.setViews(event.getViews());
         eventFullDto.setLocation(location);

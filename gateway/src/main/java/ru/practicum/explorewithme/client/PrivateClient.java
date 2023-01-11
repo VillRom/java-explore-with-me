@@ -7,9 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.explorewithme.adminRequest.events.dto.EventDto;
-import ru.practicum.explorewithme.adminRequest.events.dto.UpdateEventRequest;
-import ru.practicum.explorewithme.client.baseClient.BaseClient;
+import ru.practicum.explorewithme.adminrequest.events.dto.EventDto;
+import ru.practicum.explorewithme.adminrequest.events.dto.UpdateEventRequest;
+import ru.practicum.explorewithme.client.baseclient.BaseClient;
 
 import java.util.Map;
 
@@ -17,6 +17,10 @@ import java.util.Map;
 public class PrivateClient extends BaseClient {
 
     private static final String API_PREFIX = "/users";
+
+    private static final String URL_EVENTS = "/events";
+
+    private static final String URL_REQUESTS = "/requests";
 
     @Autowired
     public PrivateClient(@Value("${main-service.url}") String serviceUrl, RestTemplateBuilder builder) {
@@ -31,49 +35,49 @@ public class PrivateClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("/" + userId + "/events?from={from}&size={size}", parameters);
+        return get("/" + userId + URL_EVENTS + "?from={from}&size={size}", parameters);
     }
 
     public ResponseEntity<Object> updateEventByUserPrivate(Long userId, UpdateEventRequest updateEventRequest) {
-        return patch("/" + userId + "/events", updateEventRequest);
+        return patch("/" + userId + URL_EVENTS, updateEventRequest);
     }
 
     public ResponseEntity<Object> addEventPrivate(Long userId, EventDto eventDto) {
-        return post("/" + userId + "/events", eventDto);
+        return post("/" + userId + URL_EVENTS, eventDto);
     }
 
     public ResponseEntity<Object> getFullInfoAboutEventByUserPrivate(Long userId, Long eventId) {
-        return get("/" + userId + "/events/" + eventId);
+        return get("/" + userId + URL_EVENTS + "/" + eventId);
     }
 
     public ResponseEntity<Object> canceledEventByUserPrivate(Long userId, Long eventId) {
-        return patch("/" + userId + "/events/" + eventId);
+        return patch("/" + userId + URL_EVENTS + "/" + eventId);
     }
 
     public ResponseEntity<Object> getInfoAboutRequestByEventPrivate(Long userId, Long eventId) {
-        return get("/" + userId + "/events/" + eventId + "/requests");
+        return get("/" + userId + URL_EVENTS + "/" + eventId + URL_REQUESTS);
     }
 
     public ResponseEntity<Object> confirmRequestEventByUserPrivate(Long userId, Long eventId, Long reqId) {
-        return patch("/" + userId + "/events/" + eventId + "/requests/" + reqId + "/confirm");
+        return patch("/" + userId + URL_EVENTS + "/" + eventId + URL_REQUESTS + "/" + reqId + "/confirm");
     }
 
     public ResponseEntity<Object> rejectRequestEventByUserPrivate(Long userId, Long eventId, Long reqId) {
-        return patch("/" + userId + "/events/" + eventId + "/requests/" + reqId + "/reject");
+        return patch("/" + userId + URL_EVENTS + "/" + eventId + URL_REQUESTS + "/" + reqId + "/reject");
     }
 
     public ResponseEntity<Object> getRequestsByUserPrivate(Long userId) {
-        return get("/" + userId + "/requests");
+        return get("/" + userId + URL_REQUESTS);
     }
 
     public ResponseEntity<Object> addRequestPrivate(Long userId, Long eventId) {
         Map<String, Object> parameters = Map.of(
                 "eventId", eventId
         );
-        return post("/" + userId + "/requests?eventId={eventId}", parameters);
+        return post("/" + userId + URL_REQUESTS + "?eventId={eventId}", parameters);
     }
 
     public ResponseEntity<Object> cancelRequestPrivate(Long userId, Long requestId) {
-        return patch("/" + userId + "/requests/" + requestId + "/cancel");
+        return patch("/" + userId + URL_REQUESTS + "/" + requestId + "/cancel");
     }
 }

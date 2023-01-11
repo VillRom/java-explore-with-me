@@ -7,6 +7,7 @@ import ru.practicum.explorewithme.events.dto.UpdateEventRequest;
 import ru.practicum.explorewithme.participation.dto.ParticipationDto;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -14,8 +15,9 @@ public interface EventService {
 
     //Получение списка событий с возможностью фильтрации
     List<EventShortDto> getPublishedEventsWithFilter(String text, Set<Long> categoriesId, Boolean paid,
-                                                     String rangeStart, String rangeEnd, Boolean onlyAvailable,
-                                                     String sort, int from, int size, HttpServletRequest request);
+                                                     LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                                     Boolean onlyAvailable, String sort, int from, int size,
+                                                     HttpServletRequest request);
 
     //Получение опубликованного события по id
     EventFullDto getPublishedEventById(Long eventId, HttpServletRequest request);
@@ -46,7 +48,7 @@ public interface EventService {
 
     //Получение всех событий администратором
     List<EventFullDto> searchEventsByAdmin(Set<Long> usersId, Set<String> states, Set<Long> categoriesId,
-                                           String rangeStart, String rangeEnd, int from, int size);
+                                           LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size);
 
     //Изменение события администротором
     EventFullDto updateEventByAdmin(Long eventId, EventDto eventDto);

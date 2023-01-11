@@ -30,8 +30,8 @@ public class CompilationMapper {
         return compilation;
     }
 
-    public static CompilationDto.EventShortDto eventShortDtoToCompilationDtoEventShortDto(EventShortDto dto) {
-        CompilationDto.EventShortDto eventShort = new CompilationDto.EventShortDto();
+    public static EventShortDto eventShortDtoToCompilationDtoEventShortDto(EventShortDto dto) {
+        EventShortDto eventShort = new EventShortDto();
         eventShort.setEventDate(dto.getEventDate());
         eventShort.setAnnotation(dto.getAnnotation());
         eventShort.setCategory(dto.getCategory());
@@ -44,7 +44,7 @@ public class CompilationMapper {
         return eventShort;
     }
 
-    public static List<CompilationDto.EventShortDto> eventsShortDtoToCompilationsDtoEventShortDto(List<EventShortDto> dtos) {
+    public static List<EventShortDto> eventsShortDtoToCompilationsDtoEventShortDto(List<EventShortDto> dtos) {
         return dtos.stream().map(CompilationMapper::eventShortDtoToCompilationDtoEventShortDto)
                 .collect(Collectors.toList());
     }

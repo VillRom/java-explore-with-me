@@ -1,6 +1,6 @@
 package ru.practicum.explorewithme.compilation.model;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explorewithme.events.model.Event;
 
 import javax.persistence.*;
@@ -8,7 +8,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "compilation")
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class Compilation {
 
     @Id

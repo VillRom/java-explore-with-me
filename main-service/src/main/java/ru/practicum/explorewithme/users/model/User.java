@@ -1,10 +1,13 @@
 package ru.practicum.explorewithme.users.model;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {

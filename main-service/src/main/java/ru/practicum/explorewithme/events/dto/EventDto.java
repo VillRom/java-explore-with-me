@@ -1,6 +1,9 @@
 package ru.practicum.explorewithme.events.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 
 /**
@@ -15,7 +18,8 @@ public class EventDto {
 
     private String description;
 
-    private String eventDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
 
     private Location location;
 
