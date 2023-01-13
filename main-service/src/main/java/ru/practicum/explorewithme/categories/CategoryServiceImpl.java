@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.categories.dto.CategoryDto;
+import ru.practicum.explorewithme.categories.dto.NewCategoryDto;
 import ru.practicum.explorewithme.events.EventRepository;
 import ru.practicum.explorewithme.exception.EventsException;
 import ru.practicum.explorewithme.exception.NotFoundException;
@@ -22,9 +23,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto addCategory(CategoryDto categoryDto) {
+    public CategoryDto addCategory(NewCategoryDto categoryDto) {
         return CategoryMapper.categoryToCategoryDto(categoryRepository.save(CategoryMapper
-                .categoryDtoToCategory(categoryDto)));
+                .newCategoryDtoToCategory(categoryDto)));
     }
 
     @Override

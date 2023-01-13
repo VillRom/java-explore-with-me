@@ -2,13 +2,16 @@ package ru.practicum.explorewithme.events;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.explorewithme.categories.model.Category;
-import ru.practicum.explorewithme.events.dto.EventFullDto;
 import ru.practicum.explorewithme.events.dto.EventDto;
+import ru.practicum.explorewithme.events.dto.EventFullDto;
 import ru.practicum.explorewithme.events.dto.EventShortDto;
 import ru.practicum.explorewithme.events.model.Event;
+import ru.practicum.explorewithme.participation.ParticipationRepository;
 import ru.practicum.explorewithme.users.model.User;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @UtilityClass
@@ -18,6 +21,7 @@ public class EventMapper {
         Event event = new Event();
         event.setAnnotation(eventDto.getAnnotation());
         event.setCategory(category);
+        event.setConfirmedRequests(0);
         event.setDescription(eventDto.getDescription());
         event.setEventDate(eventDto.getEventDate());
         event.setLatitude(eventDto.getLocation().getLat());
@@ -68,5 +72,37 @@ public class EventMapper {
         eventDto.setViews(event.getViews());
         eventDto.setTitle(event.getTitle());
         return eventDto;
+    }
+
+    public static List<EventShortDto> eventsToEventsShortDto(List<Event> events, List<ParticipationRepository
+            .CountParticipation> countConfirmedRequests) {
+        List<EventShortDto> dtos = events.stream().map(event -> EventMapper
+                .eventToEventShortDto(event, 0)).collect(Collectors.toList());
+        if (!countConfirmedRequests.isEmpty()) {
+            for (ParticipationRepository.CountParticipation count : countConfirmedRequests) {
+                for (EventShortDto event : dtos) {
+                    if (event.getId().equals(count.getId())) {
+                        event.setConfirmedRequests(count.getCount());
+                    }
+                }
+            }
+        }
+        return dtos;
+    }
+
+    public static List<EventFullDto> eventsToEventsFullDto(List<Event> events, List<ParticipationRepository
+            .CountParticipation> countConfirmedRequests) {
+        List<EventFullDto> dtos = events.stream().map(event -> EventMapper
+                .eventToEventFullDto(event, 0)).collect(Collectors.toList());
+        if (!countConfirmedRequests.isEmpty()) {
+            for (ParticipationRepository.CountParticipation count : countConfirmedRequests) {
+                for (EventFullDto event : dtos) {
+                    if (event.getId().equals(count.getId())) {
+                        event.setConfirmedRequests(count.getCount());
+                    }
+                }
+            }
+        }
+        return dtos;
     }
 }

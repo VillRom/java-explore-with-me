@@ -2,20 +2,27 @@ package ru.practicum.explorewithme.participation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.explorewithme.participation.dto.RequestStatus;
 import ru.practicum.explorewithme.participation.model.Participation;
 
 import java.util.List;
 
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
 
-    @Query("select count(p) from Participation p where p.event.id = ?1 and p.status like concat('%', ?2, '%')")
-    Integer countByEvent_IdAndStatusContaining(Long eventId, String status);
+    @Query("select count(p) from Participation p where p.event.id = ?1 and p.status = ?2")
+    Integer countByEvent_IdAndStatus(Long eventId, RequestStatus status);
 
-    @Query("select count(distinct p) from Participation p where p.event.id in ?1 and p.status like concat('%', ?2, '%')")
-    List<Integer> countDistinctByEvent_IdIsInAndStatusContaining(List<Long> eventsId, String status);
+    @Query("select p.event.id AS id, count(p) AS count from Participation p where p.event.id in ?1 and p.status = ?2 group by p.event.id")
+    List<CountParticipation> getIds(List<Long> eventId, RequestStatus status);
 
+    interface CountParticipation {
 
-    List<Participation> findAllByEvent_IdAndStatusContaining(Long eventId, String status);
+        Long getId();
+
+        Integer getCount();
+    }
+
+    List<Participation> findAllByEvent_IdAndStatus(Long eventId, RequestStatus status);
 
     List<Participation> findAllByRequester_Id(Long userId);
 

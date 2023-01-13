@@ -6,9 +6,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.events.dto.EventFullDto;
 import ru.practicum.explorewithme.events.dto.EventShortDto;
+import ru.practicum.explorewithme.statsclient.StatsClient;
+import ru.practicum.explorewithme.statsclient.endpoint.EndpointHit;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
@@ -19,9 +22,12 @@ public class PublicEventController {
 
     private final EventService eventService;
 
+    private final StatsClient statsClient;
+
     @Autowired
-    public PublicEventController(EventService eventService) {
+    public PublicEventController(EventService eventService, StatsClient statsClient) {
         this.eventService = eventService;
+        this.statsClient = statsClient;
     }
 
     @GetMapping()
@@ -38,6 +44,13 @@ public class PublicEventController {
                                                    @RequestParam(defaultValue = "1000") int size,
                                                    HttpServletRequest request) {
         log.info("Get events with filter");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        EndpointHit hit = new EndpointHit();
+        hit.setApp("main-service");
+        hit.setIp(request.getLocalAddr());
+        hit.setUri(request.getRequestURI());
+        hit.setTimestamp(LocalDateTime.now().format(formatter));
+        statsClient.postEndpointHit(hit);
         return eventService.getPublishedEventsWithFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
                 sort, from, size, request);
     }
@@ -45,6 +58,13 @@ public class PublicEventController {
     @GetMapping("/{id}")
     public EventFullDto getFullInfoAboutEventBuId(@PathVariable Long id, HttpServletRequest request) {
         log.info("Get full info about event Id {}", id);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        EndpointHit hit = new EndpointHit();
+        hit.setApp("main-service");
+        hit.setIp(request.getLocalAddr());
+        hit.setUri(request.getRequestURI());
+        hit.setTimestamp(LocalDateTime.now().format(formatter));
+        statsClient.postEndpointHit(hit);
         return eventService.getPublishedEventById(id, request);
     }
 }

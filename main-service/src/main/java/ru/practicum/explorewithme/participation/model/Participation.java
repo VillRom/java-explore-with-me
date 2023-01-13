@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.participation.model;
 
 import lombok.*;
 import ru.practicum.explorewithme.events.model.Event;
+import ru.practicum.explorewithme.participation.dto.RequestStatus;
 import ru.practicum.explorewithme.users.model.User;
 
 import javax.persistence.*;
@@ -29,5 +30,6 @@ public class Participation {
     @JoinColumn(name = "requester_id")
     private User requester;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status;
 }

@@ -14,6 +14,7 @@ import ru.practicum.explorewithme.events.model.Event;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.exception.RequestException;
 import ru.practicum.explorewithme.participation.ParticipationRepository;
+import ru.practicum.explorewithme.participation.dto.RequestStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> events = eventRepository.findAllById(compilationDto.getEvents());
         for (Event event : events) {
             eventsDto.add(EventMapper.eventToEventShortDto(event,
-                    participationRepository.countByEvent_IdAndStatusContaining(event.getId(), "CONFIRMED")));
+                    participationRepository.countByEvent_IdAndStatus(event.getId(), RequestStatus.CONFIRMED)));
         }
         return CompilationMapper.compilationToCompilationDto(compRepository.save(CompilationMapper
                 .newCompilationDtoToCompilation(compilationDto, events)), eventsDto);
@@ -109,8 +110,8 @@ public class CompilationServiceImpl implements CompilationService {
                 List<Event> events = compilation.getEvents();
                 for (Event event : events) {
                     eventsDto.add(EventMapper.eventToEventShortDto(event,
-                            participationRepository.countByEvent_IdAndStatusContaining(event.getId(),
-                                    "CONFIRMED")));
+                            participationRepository.countByEvent_IdAndStatus(event.getId(),
+                                    RequestStatus.CONFIRMED)));
                 }
                 compDto.add(CompilationMapper.compilationToCompilationDto(compilation, eventsDto));
             }
@@ -121,8 +122,8 @@ public class CompilationServiceImpl implements CompilationService {
                 List<Event> events = compilation.getEvents();
                 for (Event event : events) {
                     eventsDto.add(EventMapper.eventToEventShortDto(event,
-                            participationRepository.countByEvent_IdAndStatusContaining(event.getId(),
-                                    "CONFIRMED")));
+                            participationRepository.countByEvent_IdAndStatus(event.getId(),
+                                    RequestStatus.CONFIRMED)));
                 }
                 compDto.add(CompilationMapper.compilationToCompilationDto(compilation, eventsDto));
             }
@@ -138,7 +139,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<EventShortDto> eventsDto = new ArrayList<>();
         for (Event event : events) {
             eventsDto.add(EventMapper.eventToEventShortDto(event,
-                    participationRepository.countByEvent_IdAndStatusContaining(event.getId(), "CONFIRMED")));
+                    participationRepository.countByEvent_IdAndStatus(event.getId(), RequestStatus.CONFIRMED)));
         }
         return CompilationMapper.compilationToCompilationDto(compilation, eventsDto);
     }

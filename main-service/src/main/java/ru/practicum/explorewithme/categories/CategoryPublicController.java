@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.categories;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.categories.CategoryService;
 import ru.practicum.explorewithme.categories.dto.CategoryDto;
 
 import java.util.List;

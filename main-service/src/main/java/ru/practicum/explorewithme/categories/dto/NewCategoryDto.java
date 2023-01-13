@@ -10,5 +10,5 @@ import java.io.Serializable;
 @Data
 public class NewCategoryDto implements Serializable {
 
-    private final String name;
+    private String name;
 }

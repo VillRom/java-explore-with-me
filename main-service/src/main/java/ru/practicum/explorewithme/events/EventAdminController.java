@@ -4,13 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.events.EventService;
 import ru.practicum.explorewithme.events.dto.EventDto;
 import ru.practicum.explorewithme.events.dto.EventFullDto;
+import ru.practicum.explorewithme.events.dto.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -35,7 +36,13 @@ public class EventAdminController {
                                                 @RequestParam(defaultValue = "0") int from,
                                                 @RequestParam(defaultValue = "1000") int size) {
         log.info("Get request: search events by admin");
-        return eventService.searchEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
+        List<EventState> statesReform;
+        if (states != null) {
+            statesReform = states.stream().map(EventState::valueOf).collect(Collectors.toList());
+        } else {
+            statesReform = null;
+        }
+        return eventService.searchEventsByAdmin(users, statesReform, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PutMapping("/{eventId}")

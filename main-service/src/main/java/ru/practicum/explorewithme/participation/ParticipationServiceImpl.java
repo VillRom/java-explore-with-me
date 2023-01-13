@@ -9,6 +9,7 @@ import ru.practicum.explorewithme.exception.EventsException;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.exception.RequestException;
 import ru.practicum.explorewithme.participation.dto.ParticipationDto;
+import ru.practicum.explorewithme.participation.dto.RequestStatus;
 import ru.practicum.explorewithme.participation.model.Participation;
 import ru.practicum.explorewithme.users.UserRepository;
 import ru.practicum.explorewithme.users.model.User;
@@ -51,16 +52,16 @@ public class ParticipationServiceImpl implements ParticipationService {
             throw new EventsException("Нельзя подать заявку на неопубликованное событие");
         }
         if (event.getParticipantLimit().equals(participationRepository
-                .countByEvent_IdAndStatusContaining(eventId, "CONFIRMED"))) {
+                .countByEvent_IdAndStatus(eventId, RequestStatus.CONFIRMED))) {
             throw new EventsException("Лимит заявок на событие исчерпан");
         }
         ParticipationDto participationDto = new ParticipationDto();
         participationDto.setRequester(userId);
         participationDto.setEvent(eventId);
         if (!event.getRequestModeration()) {
-            participationDto.setStatus("CONFIRMED");
+            participationDto.setStatus(RequestStatus.CONFIRMED);
         } else {
-            participationDto.setStatus("PENDING");
+            participationDto.setStatus(RequestStatus.PENDING);
         }
         participationDto.setCreated(LocalDateTime.now());
         return ParticipationMapper.participationToParticipationDto(participationRepository.save(ParticipationMapper
@@ -74,8 +75,8 @@ public class ParticipationServiceImpl implements ParticipationService {
         }
         Participation participation = participationRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос с id-" + requestId + " не найден"));
-        if (participation.getStatus().equals("PENDING")) {
-            participation.setStatus("CANCELED");
+        if (participation.getStatus() == RequestStatus.PENDING) {
+            participation.setStatus(RequestStatus.CANCELED);
             return ParticipationMapper.participationToParticipationDto(participationRepository.save(participation));
         } else {
             throw new RequestException("Статус заявки находится на в ожидании. Статус - " + participation.getStatus());

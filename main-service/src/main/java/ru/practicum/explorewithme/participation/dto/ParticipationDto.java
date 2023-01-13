@@ -19,5 +19,5 @@ public class ParticipationDto implements Serializable {
 
     private Long requester;
 
-    private String status;
+    private RequestStatus status;
 }

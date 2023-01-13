@@ -1,9 +1,6 @@
 package ru.practicum.explorewithme.events;
 
-import ru.practicum.explorewithme.events.dto.EventFullDto;
-import ru.practicum.explorewithme.events.dto.EventDto;
-import ru.practicum.explorewithme.events.dto.EventShortDto;
-import ru.practicum.explorewithme.events.dto.UpdateEventRequest;
+import ru.practicum.explorewithme.events.dto.*;
 import ru.practicum.explorewithme.participation.dto.ParticipationDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +44,7 @@ public interface EventService {
     ParticipationDto rejectRequestInEventByUser(Long userId, Long eventId, Long reqId);
 
     //Получение всех событий администратором
-    List<EventFullDto> searchEventsByAdmin(Set<Long> usersId, Set<String> states, Set<Long> categoriesId,
+    List<EventFullDto> searchEventsByAdmin(Set<Long> usersId, List<EventState> states, Set<Long> categoriesId,
                                            LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size);
 
     //Изменение события администротором

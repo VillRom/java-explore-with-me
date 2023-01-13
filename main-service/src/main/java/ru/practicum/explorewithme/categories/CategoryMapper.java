@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.categories;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.explorewithme.categories.dto.CategoryDto;
+import ru.practicum.explorewithme.categories.dto.NewCategoryDto;
 import ru.practicum.explorewithme.categories.model.Category;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public class CategoryMapper {
         Category category = new Category();
         category.setId(categoryDto.getId());
         category.setName(categoryDto.getName());
+        return category;
+    }
+
+    public static Category newCategoryDtoToCategory(NewCategoryDto dto) {
+        Category category = new Category();
+        category.setName(dto.getName());
         return category;
     }
 

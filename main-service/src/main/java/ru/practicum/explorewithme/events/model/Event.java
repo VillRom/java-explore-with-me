@@ -26,6 +26,8 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    private Integer confirmedRequests;
+
     private LocalDateTime creationOn;
 
     private String description;
