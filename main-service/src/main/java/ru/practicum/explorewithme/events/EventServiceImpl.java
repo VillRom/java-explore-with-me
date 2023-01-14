@@ -21,7 +21,6 @@ import ru.practicum.explorewithme.participation.dto.ParticipationDto;
 import ru.practicum.explorewithme.participation.dto.RequestStatus;
 import ru.practicum.explorewithme.participation.model.Participation;
 import ru.practicum.explorewithme.statsclient.StatsClient;
-import ru.practicum.explorewithme.statsclient.endpoint.EndpointHit;
 import ru.practicum.explorewithme.statsclient.endpoint.ViewsStats;
 import ru.practicum.explorewithme.users.UserRepository;
 
@@ -69,17 +68,6 @@ public class EventServiceImpl implements EventService {
         }
         Page<Event> eventPage = eventRepository.findAll(Objects.requireNonNull(ExpressionUtils.allOf(predicates)),
                 PageRequest.of(from, size));
-        List<String> uris = new ArrayList<>();
-        for (Event eventUri : eventPage) {
-            saveView(request.getRequestURI() + "/" + eventUri.getId(), request.getRemoteAddr());
-            uris.add(request.getRequestURI() + "/" +  eventUri.getId());
-        }
-        List<ViewsStats> views = getViewsByEvent(rangeStart, rangeEnd, uris);
-        for (Event eventView : Objects.requireNonNull(eventPage)) {
-            eventView.setViews(views.stream()
-                    .filter(viewsStats -> viewsStats.getUri().equals(request.getRequestURI() + "/" + eventView.getId()))
-                    .findFirst().get().getHits());
-        }
         if (eventPage.getSize() > 1) {
             if (sort != null && sort.equals("EVENT_DATE")) {
                 eventPage.stream().sorted(Comparator.comparing(Event::getEventDate));
@@ -89,7 +77,8 @@ public class EventServiceImpl implements EventService {
         }
         return EventMapper.eventsToEventsShortDto(eventPage.stream().collect(Collectors.toList()),
                 participationRepository.getIds(eventPage.stream().map(Event::getId).collect(Collectors.toList()),
-                        RequestStatus.CONFIRMED));
+                        RequestStatus.CONFIRMED).stream().collect(Collectors.toMap(ParticipationRepository
+                        .CountParticipation::getId, ParticipationRepository.CountParticipation::getCount)));
     }
 
     @Override
@@ -129,12 +118,12 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Пользователь с id-" + userId + " не найден");
         }
         Page<Event> events = eventRepository.findAllByInitiator_Id(userId, PageRequest.of(from, size));
-        List<EventShortDto> eventsShortDto = new ArrayList<>();
-        for (Event event : events) {
-            eventsShortDto.add(EventMapper.eventToEventShortDto(event, participationRepository
-                    .countByEvent_IdAndStatus(event.getId(), RequestStatus.CONFIRMED)));
-        }
-        return eventsShortDto;
+        return EventMapper.eventsToEventsShortDto(events.stream().collect(Collectors.toList()),
+                participationRepository.getIds(events.stream()
+                                .map(Event::getId)
+                                .collect(Collectors.toList()), RequestStatus.CONFIRMED).stream()
+                        .collect(Collectors.toMap(ParticipationRepository
+                        .CountParticipation::getId, ParticipationRepository.CountParticipation::getCount)));
     }
 
     @Override
@@ -375,16 +364,6 @@ public class EventServiceImpl implements EventService {
         String start = rangeStart == null ? LocalDateTime.now().minusYears(5).format(formatter) : rangeStart.format(formatter);
         String end = rangeEnd == null ? LocalDateTime.now().plusSeconds(2).format(formatter) : rangeEnd.format(formatter);
         return statsClient.getViews(start, end, uris, false);
-    }
-
-    private void saveView(String uri, String ip) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        EndpointHit hit = new EndpointHit();
-        hit.setApp("main-service");
-        hit.setIp(ip);
-        hit.setUri(uri);
-        hit.setTimestamp(LocalDateTime.now().format(formatter));
-        statsClient.postEndpointHit(hit);
     }
 
     private void changeStatusOfParticipantToRejected(Long eventId) {

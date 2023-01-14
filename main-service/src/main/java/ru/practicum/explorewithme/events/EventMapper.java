@@ -11,6 +11,7 @@ import ru.practicum.explorewithme.users.model.User;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -74,17 +75,12 @@ public class EventMapper {
         return eventDto;
     }
 
-    public static List<EventShortDto> eventsToEventsShortDto(List<Event> events, List<ParticipationRepository
-            .CountParticipation> countConfirmedRequests) {
+    public static List<EventShortDto> eventsToEventsShortDto(List<Event> events, Map<Long, Integer> counter) {
         List<EventShortDto> dtos = events.stream().map(event -> EventMapper
                 .eventToEventShortDto(event, 0)).collect(Collectors.toList());
-        if (!countConfirmedRequests.isEmpty()) {
-            for (ParticipationRepository.CountParticipation count : countConfirmedRequests) {
-                for (EventShortDto event : dtos) {
-                    if (event.getId().equals(count.getId())) {
-                        event.setConfirmedRequests(count.getCount());
-                    }
-                }
+        for (EventShortDto event : dtos) {
+            if (counter.containsKey(event.getId())) {
+                event.setConfirmedRequests(counter.get(event.getId()));
             }
         }
         return dtos;

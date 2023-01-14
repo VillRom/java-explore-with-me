@@ -37,12 +37,13 @@ public class CompilationServiceImpl implements CompilationService {
         if (compilationDto.getTitle() == null) {
             throw new RequestException("Поле title не должно быть пустым");
         }
-        List<EventShortDto> eventsDto = new ArrayList<>();
         List<Event> events = eventRepository.findAllById(compilationDto.getEvents());
-        for (Event event : events) {
-            eventsDto.add(EventMapper.eventToEventShortDto(event,
-                    participationRepository.countByEvent_IdAndStatus(event.getId(), RequestStatus.CONFIRMED)));
-        }
+        List<EventShortDto> eventsDto = EventMapper.eventsToEventsShortDto(events, participationRepository
+                .getIds(events.stream()
+                                .map(Event::getId)
+                                .collect(Collectors.toList()), RequestStatus.CONFIRMED).stream()
+                        .collect(Collectors.toMap(ParticipationRepository
+                        .CountParticipation::getId, ParticipationRepository.CountParticipation::getCount)));
         return CompilationMapper.compilationToCompilationDto(compRepository.save(CompilationMapper
                 .newCompilationDtoToCompilation(compilationDto, events)), eventsDto);
     }
@@ -106,25 +107,23 @@ public class CompilationServiceImpl implements CompilationService {
         if (pinned == null) {
             compilations = compRepository.findAll();
             for (Compilation compilation : compilations) {
-                List<EventShortDto> eventsDto = new ArrayList<>();
-                List<Event> events = compilation.getEvents();
-                for (Event event : events) {
-                    eventsDto.add(EventMapper.eventToEventShortDto(event,
-                            participationRepository.countByEvent_IdAndStatus(event.getId(),
-                                    RequestStatus.CONFIRMED)));
-                }
+                List<EventShortDto> eventsDto = EventMapper.eventsToEventsShortDto(compilation.getEvents(),
+                        participationRepository.getIds(compilation.getEvents().stream()
+                                        .map(Event::getId)
+                                        .collect(Collectors.toList()), RequestStatus.CONFIRMED).stream()
+                                .collect(Collectors.toMap(ParticipationRepository
+                                .CountParticipation::getId, ParticipationRepository.CountParticipation::getCount)));
                 compDto.add(CompilationMapper.compilationToCompilationDto(compilation, eventsDto));
             }
         } else {
             compilations = compRepository.findAllByPinned(pinned, PageRequest.of(from, size)).getContent();
             for (Compilation compilation : compilations) {
-                List<EventShortDto> eventsDto = new ArrayList<>();
-                List<Event> events = compilation.getEvents();
-                for (Event event : events) {
-                    eventsDto.add(EventMapper.eventToEventShortDto(event,
-                            participationRepository.countByEvent_IdAndStatus(event.getId(),
-                                    RequestStatus.CONFIRMED)));
-                }
+                List<EventShortDto> eventsDto = EventMapper.eventsToEventsShortDto(compilation.getEvents(),
+                        participationRepository.getIds(compilation.getEvents().stream()
+                                        .map(Event::getId)
+                                        .collect(Collectors.toList()), RequestStatus.CONFIRMED).stream()
+                                .collect(Collectors.toMap(ParticipationRepository
+                                .CountParticipation::getId, ParticipationRepository.CountParticipation::getCount)));
                 compDto.add(CompilationMapper.compilationToCompilationDto(compilation, eventsDto));
             }
         }
@@ -135,12 +134,12 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compRepository.findById(compId).orElseThrow(() ->
                 new NotFoundException("Entity with id-" + compId + " not found"));
-        List<Event> events = compilation.getEvents();
-        List<EventShortDto> eventsDto = new ArrayList<>();
-        for (Event event : events) {
-            eventsDto.add(EventMapper.eventToEventShortDto(event,
-                    participationRepository.countByEvent_IdAndStatus(event.getId(), RequestStatus.CONFIRMED)));
-        }
+        List<EventShortDto> eventsDto = EventMapper.eventsToEventsShortDto(compilation.getEvents(),
+                participationRepository.getIds(compilation.getEvents().stream()
+                                .map(Event::getId)
+                                .collect(Collectors.toList()), RequestStatus.CONFIRMED).stream()
+                        .collect(Collectors.toMap(ParticipationRepository
+                        .CountParticipation::getId, ParticipationRepository.CountParticipation::getCount)));
         return CompilationMapper.compilationToCompilationDto(compilation, eventsDto);
     }
 }
