@@ -128,10 +128,10 @@ public class SpecificLocationServiceImpl implements SpecificLocationService {
     }
 
     private Double calculateDistanceBetweenTwoPoints(Double lat1, Double lon1, Double lat2, Double lon2) {
-        double radLatFirst = Math.PI * lat1/180;
-        double radLatSec = Math.PI * lat2/180;
+        double radLatFirst = Math.PI * lat1 / 180;
+        double radLatSec = Math.PI * lat2 / 180;
         double theta = lon1 - lon2;
-        double radTheta = Math.PI * theta/180;
+        double radTheta = Math.PI * theta / 180;
         Double dist = Math.sin(radLatFirst) * Math.sin(radLatSec) + Math.cos(radLatFirst) * Math.cos(radLatSec)
                 * Math.cos(radTheta);
         dist = Math.acos(dist);
