@@ -48,7 +48,9 @@ public class SpecificLocationAdminController {
                                                    @RequestParam int size) {
         if (ids == null) {
             log.info("Get all locations");
-        } else log.info("Get find locations - {}", ids);
+        } else {
+            log.info("Get find locations - {}", ids);
+        }
         return service.findLocationsByIds(ids, from, size);
     }
 
