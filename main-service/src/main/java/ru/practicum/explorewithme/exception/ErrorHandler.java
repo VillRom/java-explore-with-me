@@ -52,4 +52,13 @@ public class ErrorHandler {
         return new ApiError(errors, e.getLocalizedMessage(), "Исключение в" +
                 " запросе " + webRequest.getDescription(false), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleLocationException(final LocationException e, WebRequest webRequest) {
+        List<String> errors = new ArrayList<>();
+        Arrays.stream(e.getStackTrace()).forEach(error -> errors.add(error.toString()));
+        return new ApiError(errors, e.getLocalizedMessage(), "Исключение в" +
+                " запросе " + webRequest.getDescription(false), HttpStatus.BAD_REQUEST);
+    }
 }
